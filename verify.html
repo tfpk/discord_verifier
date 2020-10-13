@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+  <title>Discord Verify</title>
+
+  <!-- Required Stylesheets -->
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+
+  <!-- Load polyfills to support older browsers -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+
+  <!-- Required scripts -->
+  <script src="https://unpkg.com/vue@latest/dist/vue.js"></script>
+  <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div id="app" class="m-3">
+    <b-container>
+      <h1>CSESoc Discord Verifier</h1>
+
+      <div class="alert alert-danger" v-if="data.error" v-html="data.error.text"> </div>
+
+      <div class="m-3">
+        <form @submit.prevent="query_server">
+        <b-form-group horizontal :label-cols="2" label="Your zID">
+          <b-form-input :disabled="state > STATES.LOGIN" v-model="data.login.zid" placeholder="z1234567"></b-form-input>
+        </b-form-group>
+
+        <b-form-group horizontal :label-cols="2" label="Your zPass">
+          <b-form-input type="password" :disabled="state > STATES.LOGIN" v-model="data.login.zpass"></b-form-input>
+        </b-form-group>
+        <b-row>
+          <b-col cols="11">
+            <b-button type="submit" variant="primary" :disabled="state > STATES.LOGIN">
+              Login
+            </b-button>
+          </b-col>
+          <b-col cols="1">
+            <div class="spinner-border" role="status" v-if="state == STATES.SUBMITTING_LOGIN">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </b-col>
+        </b-row>
+        </form>
+      <hr />
+      </div>
+
+      <div class="m-3" v-if="state >= STATES.ASK_DETAILS">
+        <form @submit.prevent="query_server">
+        <b-form-group horizontal :label-cols="4" label="Your Discord Username">
+          <b-form-input :disabled="state > STATES.ASK_DETAILS" v-model.trim="data.discord.discord_username" placeholder="username#1234"></b-form-input>
+        </b-form-group>
+
+        <b-row>
+          <b-col cols="11">
+            <b-button variant="primary" :disabled="state > STATES.ASK_DETAILS" @click="query_server">
+              Confirm Username
+            </b-button>
+          </b-col>
+          <b-col cols="1">
+            <div class="spinner-border" role="status" v-if="state == STATES.SUBMITTING_DETAILS">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </b-col>
+        </b-row>
+        </form>
+        <hr />
+      </div>
+
+      <div class="m-3" v-if="state >= STATES.CONFIRM_DETAILS">
+        <form @submit.prevent="query_server">
+        <table class="table">
+          <tbody>
+            <tr>
+              <th scope="row">Discord Username</th>
+              <td>
+                <span>
+                  {{ discord_username }} 
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Your zID</th>
+              <td>{{data.login.zid}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Your Name</th>
+              <td>{{data.login.name}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Your Email</th>
+              <td>{{data.login.email}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <b-form-checkbox required v-model="data.confirmation.confirm_terms">
+          I have read and accept the server rules.
+        </b-form-checkbox>
+        <b-form-checkbox required v-model="data.confirmation.confirm_details">
+            I have checked the details, and {{ discord_username }} is my Discord name!
+        </b-form-checkbox>
+        <b-row>
+          <b-col cols="9">
+            <b-button variant="primary" :disabled="state != STATES.CONFIRM_DETAILS" @click="query_server()">
+                 Submit for Verification
+            </b-button>
+          </b-col>
+          <b-col cols="3">
+              <b-button :disabled="state != STATES.CONFIRM_DETAILS" variant="danger" @click="data.discord.ok = false; data.error = {'text': 'If the error persists, contact apps.discord@cse.unsw.edu.au'}">
+                  Go Back
+              </b-button>
+          </b-col>
+        </b-row>
+        </form>
+        <hr />
+      </div>
+
+      <div class="m-3" v-if="state >= STATES.CONFIRM_RULES">
+        <b-row>
+          <b-col cols="8">
+          </b-col>
+          <b-col cols="3">
+            <b-button @click="verify_username()" variant="success" :disabled="!rules || state != STATES.CONFIRM_RULES">Verify Me!</b-button>
+          </b-col>
+          <b-col cols="1">
+            <div class="spinner-border" role="status" v-if="state == STATES.SUBMITTING_CONFIRM">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </b-col>
+        </b-row>
+        <hr />
+      </div>
+      <div class="alert alert-success" v-if="state == STATES.VERIFIED">
+        Congratulations, you have been verified! If you don't see a "verified" role added to
+        you in the next minute, please get in touch with a Server Admin.
+      </div>
+    </b-container>
+  </div>
+
+  <script>
+    var STATES = {
+      LOGIN: 0,
+      SUBMITTING_LOGIN: 1,
+      ASK_DETAILS: 2,
+      SUBMITTING_DETAILS: 3,
+      CONFIRM_DETAILS: 4,
+      SUBMITTING_CONFIRM: 5,
+      VERIFIED: 6,
+    };
+    window.app = new Vue({
+      el: "#app",
+      data: {
+        submitting: false,
+        data: {
+          login: {
+            zid: null,
+            zpass: null,
+            name: null,
+            email: null,
+            ok: false
+          },
+          discord: {
+            discord_username: null,
+            discord_id: null,
+            info: null,
+            ok: false
+          },
+          confirmation: {
+            confirm_terms: true,
+            confirm_details: false,
+            ok: false
+          },
+          error: null,
+          /* matches the last part of the url surrounded by /s */
+          site: window.location.href.match(/.*\/(.*?)\//)[1]
+        },
+        STATES: STATES,
+      },
+      computed: {
+        state() {
+          let submitting_plus = this.submitting ? 1 : 0;
+          if (!this.data.login.ok) {
+            return STATES.LOGIN + submitting_plus;
+          } else if (!this.data.discord.ok) {
+            return STATES.ASK_DETAILS + submitting_plus;
+          } else if (!this.data.confirmation.ok) {
+            return STATES.CONFIRM_DETAILS + submitting_plus;
+          } else {
+            return STATES.VERIFIED;
+          }
+        },
+        discord_username() {
+            return this.data.discord.info.user.username + "#" + this.data.discord.info.user.discriminator;
+        }
+      },
+      methods: {
+        query_server() {
+          this.submitting = true;
+          axios.post("/~apps/discord/server.cgi/verify/", this.data).then(
+            function(resp) {
+              this.data = resp.data;
+              this.submitting = false;
+            }.bind(this)
+          ).catch(function() {
+            this.submitting = false;
+            this.data.error = {
+              text: "The server encountered an error it could not handle! Please try again, or contact CSESoc via Facebook!"
+            };
+          }.bind(this));
+        }
+      },
+    });
+  </script>
+</body>
+
+</html>
