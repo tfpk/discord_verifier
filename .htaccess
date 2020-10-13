@@ -4,6 +4,6 @@ RedirectMatch 404 /\.git
 <IfModule !mod_ssl.c>
 Redirect / https://www.cse.unsw.edu.au/
 </IfModule> 
-<Files verifier.cgi>
+<Files server.cgi>
     SetHandler application/x-setuid-cgi
 </Files>

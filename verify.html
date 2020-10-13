@@ -25,7 +25,7 @@
 <body>
   <div id="app" class="m-3">
     <b-container>
-      <h1>CSESoc Discord Verifier</h1>
+      <div v-html="custom.brand"></div>
 
       <div class="alert alert-danger" v-if="data.error" v-html="data.error.text"> </div>
 
@@ -78,6 +78,10 @@
 
       <div class="m-3" v-if="state >= STATES.CONFIRM_DETAILS">
         <form @submit.prevent="query_server">
+      <div v-html="custom.rules"></div>
+        <b-form-checkbox required v-model="data.confirmation.confirm_terms">
+          I have read and accept the server rules.
+        </b-form-checkbox>
         <table class="table">
           <tbody>
             <tr>
@@ -102,9 +106,6 @@
             </tr>
           </tbody>
         </table>
-        <b-form-checkbox required v-model="data.confirmation.confirm_terms">
-          I have read and accept the server rules.
-        </b-form-checkbox>
         <b-form-checkbox required v-model="data.confirmation.confirm_details">
             I have checked the details, and {{ discord_username }} is my Discord name!
         </b-form-checkbox>
@@ -175,13 +176,17 @@
             ok: false
           },
           confirmation: {
-            confirm_terms: true,
+            confirm_terms: false,
             confirm_details: false,
             ok: false
           },
           error: null,
           /* matches the last part of the url surrounded by /s */
           site: window.location.href.match(/.*\/(.*?)\//)[1]
+        },
+        custom: {
+          rules: "",
+          brand: ""
         },
         STATES: STATES,
       },
@@ -218,6 +223,10 @@
           }.bind(this));
         }
       },
+      mounted() {
+        axios.get("brand.html").then(function(resp) {this.custom.brand = resp.data;}.bind(this))
+        axios.get("rules.html").then(function(resp) {this.custom.rules = resp.data;}.bind(this))
+      }
     });
   </script>
 </body>

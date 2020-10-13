@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+  <title>Discord Verify</title>
+
+  <!-- Required Stylesheets -->
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+
+  <!-- Load polyfills to support older browsers -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+
+  <!-- Required scripts -->
+  <script src="https://unpkg.com/vue@latest/dist/vue.js"></script>
+  <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div id="app" class="m-3">
+    <b-container>
+      <h1>Discord Verifier Admin</h1>
+
+      <div class="alert alert-danger" v-if="data.error" v-html="data.error.text"> </div>
+      <div class="alert alert-info" v-if="data.info" v-html="data.info.text"> </div>
+
+      <div class="m-3" v-if="!authenticated">
+        <form @submit.prevent="query_server">
+          <b-form-group horizontal :label-cols="2" label="Your zID">
+            <b-form-input :disabled="!authenticated && submitting" v-model="data.login.zid" placeholder="z1234567"></b-form-input>
+          </b-form-group>
+
+          <b-form-group horizontal :label-cols="2" label="Your zPass">
+            <b-form-input type="password" :disabled="!authenticated && submitting" v-model="data.login.zpass"></b-form-input>
+          </b-form-group>
+          <b-row>
+            <b-col cols="11">
+              <b-button type="submit" variant="primary" :disabled="submitting">
+                Login
+              </b-button>
+            </b-col>
+            <b-col cols="1">
+              <div class="spinner-border" role="status" v-if="submitting">
+                <span class="sr-only">Submitting...</span>
+              </div>
+            </b-col>
+          </b-row>
+        </form>
+        <hr />
+      </div>
+
+      <div class="m-3" v-if="authenticated">
+        <form @submit.prevent="query_server">
+          <b-form-group horizontal :label-cols="4" label="Your Discord Server ID: ">
+            <b-form-input :disabled="submitting" v-model.trim="data.settings.server"></b-form-input>
+          </b-form-group>
+          <b-form-group horizontal :label-cols="4" label="The name of the role to grant upon verification">
+            <b-form-input :disabled="submitting" v-model.trim="data.settings.role_name"></b-form-input>
+          </b-form-group>
+          <b-form-group horizontal :label-cols="4" label="Admins (as a json array): ">
+            <b-form-input :disabled="submitting" v-model.trim="data.settings.admins"></b-form-input>
+          </b-form-group>
+          <b-form-group horizontal :label-cols="4" label="Your Server Brand (Appears at the top)">
+            <b-form-textarea :disabled="submitting" v-model="data.settings.brand" placeholder="Enter something..." rows="3"></b-form-textarea>
+          </b-form-group>
+          <b-form-group horizontal :label-cols="4" label="Your Server Rules (have to be accepted)">
+            <b-form-textarea :disabled="submitting" v-model="data.settings.rules" placeholder="Enter something..." rows="6"></b-form-textarea>
+          </b-form-group>
+          <b-button type="submit" variant="primary" :disabled="submitting">
+            Save
+          </b-button>
+        </form>
+        <h2>Student Signups</h2>
+        <pre>{{data.students}}</pre>
+      </div>
+    </b-container>
+  </div>
+
+  <script>
+    window.app = new Vue({
+      el: "#app",
+      data: {
+        submitting: false,
+        data: {
+          login: {
+            zid: null,
+            zpass: null,
+            name: null,
+            email: null,
+            ok: false
+          },
+          settings: {
+            brand: "",
+            rules: "",
+            server: "",
+            role_name: "",
+            admins: "",
+            update: false
+          },
+          students: "",
+          error: null,
+          info: null,
+          /* matches the last part of the url surrounded by /s */
+          site: window.location.href.match(/.*\/(.*?)\//)[1]
+        },
+      },
+      computed: {
+        discord_username() {
+          return this.data.discord.info.user.username + "#" + this.data.discord.info.user.discriminator;
+        },
+        authenticated() {
+          return this.data.login.ok;
+        }
+      },
+      methods: {
+        query_server() {
+          this.submitting = true;
+          axios.post("/~apps/discord/server.cgi/admin/", this.data).then(
+            function(resp) {
+              this.data = resp.data;
+              this.submitting = false;
+            }.bind(this)
+          ).catch(function() {
+            this.submitting = false;
+            this.data.error = {
+              text: "The server encountered an error it could not handle! Please try again, or contact CSESoc via Facebook!"
+            };
+          }.bind(this));
+        }
+      },
+    });
+  </script>
+</body>
+
+</html>
