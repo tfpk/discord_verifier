@@ -1,5 +1,6 @@
 Options -Indexes
 RedirectMatch 404 /\.git
+RedirectMatch 404 /\.py
 
 <IfModule !mod_ssl.c>
 Redirect / https://www.cse.unsw.edu.au/
