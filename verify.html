@@ -38,6 +38,7 @@
         <b-form-group horizontal :label-cols="2" label="Your zPass">
           <b-form-input type="password" :disabled="state > STATES.LOGIN" v-model="data.login.zpass"></b-form-input>
         </b-form-group>
+        <br />
         <b-row>
           <b-col cols="11">
             <b-button type="submit" variant="primary" :disabled="state > STATES.LOGIN">
@@ -78,9 +79,12 @@
 
       <div class="m-3" v-if="state >= STATES.CONFIRM_DETAILS">
         <form @submit.prevent="query_server">
+      <h4>Society Rules</h4>
       <div v-html="custom.rules"></div>
+      <h4>Arc Terms of Use</h4>
+      <div v-html="custom.arc_rules"></div>
         <b-form-checkbox required v-model="data.confirmation.confirm_terms">
-          I have read and accept the server rules.
+          I have read and accept the server rules and Arc terms.
         </b-form-checkbox>
         <table class="table">
           <tbody>
@@ -107,11 +111,12 @@
           </tbody>
         </table>
         <b-form-checkbox required v-model="data.confirmation.confirm_details">
-            I have checked the details, and {{ discord_username }} is my Discord name!
+            I have checked the details, and '{{ discord_username }}' is my Discord name!
         </b-form-checkbox>
+		<br/>
         <b-row>
           <b-col cols="9">
-            <b-button variant="primary" :disabled="state != STATES.CONFIRM_DETAILS" @click="query_server()">
+            <b-button variant="primary" :disabled="state != STATES.CONFIRM_DETAILS || !(data.confirmation.confirm_details && data.confirmation.confirm_terms)" @click="query_server()">
                  Submit for Verification
             </b-button>
           </b-col>
@@ -186,7 +191,8 @@
         },
         custom: {
           rules: "",
-          brand: ""
+          brand: "",
+          arc_rules: ""
         },
         STATES: STATES,
       },
@@ -218,7 +224,7 @@
           ).catch(function() {
             this.submitting = false;
             this.data.error = {
-              text: "The server encountered an error it could not handle! Please try again, or contact CSESoc via Facebook!"
+              text: "The server encountered an error it could not handle! Please try again, or contact the club you're trying to join! If you can't contact them, contact apps.discord@cse.unsw.edu.au"
             };
           }.bind(this));
         }
@@ -226,6 +232,7 @@
       mounted() {
         axios.get("brand.html").then(function(resp) {this.custom.brand = resp.data;}.bind(this))
         axios.get("rules.html").then(function(resp) {this.custom.rules = resp.data;}.bind(this))
+        axios.get("../arc_admin/rules.html").then(function(resp) {this.custom.arc_rules = resp.data;}.bind(this))
       }
     });
   </script>

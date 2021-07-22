@@ -8,3 +8,6 @@ Redirect / https://www.cse.unsw.edu.au/
 <Files server.cgi>
     SetHandler application/x-setuid-cgi
 </Files>
+<Files serverd.cgi>
+    SetHandler application/x-setuid-cgid
+</Files>
