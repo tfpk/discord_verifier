@@ -1,5 +1,3 @@
-#!/web/apps/discord/env.sh
-
 import csv
 import datetime
 import copy

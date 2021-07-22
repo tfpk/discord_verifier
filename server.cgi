@@ -1,3 +1,5 @@
+#!/web/apps/discord/env.sh
+
 from wsgiref.handlers import CGIHandler
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import HTTPException
