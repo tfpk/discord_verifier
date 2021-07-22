@@ -10,7 +10,7 @@ TEMPLATE_BRAND = """\
 <div class="m-3">
 <h1>{full_name} Discord Verifier</h1>
 </div>
-<p>Please ensure you have joined the server!</p>%
+<p>Please ensure you have joined the server!</p>
 
 """
 
@@ -77,8 +77,8 @@ You can find instructions on using your verifier here:
 https://web.cse.unsw.edu.au/~apps/discord/documentation.html
 
 The two pages you now have access to are:
-For your users: https://web.cse.unsw.edu.au/~apps/discord/{{short_name}}/
-For your admins: https://web.cse.unsw.edu.au/~apps/discord/{{short_name}}/admin.html
+For your users: https://web.cse.unsw.edu.au/~apps/discord/{short_name}/
+For your admins: https://web.cse.unsw.edu.au/~apps/discord/{short_name}/admin.html
 
 There are two important pieces of information you will need:
 Your Short Code: {short_name}
@@ -103,8 +103,8 @@ def create_subsite(
 
     site_path.mkdir(mode=0o755)
 
-    for link_file in ["admin.html", "index.html"]:
-        (site_path / link_file).symlink_to("../" + link_file)
+    for link_from, link_to in [("admin.html", "admin.html"), ("index.html", "verify.html")]:
+        (site_path / link_from).symlink_to("../" + link_to)
 
     # Configuration Files
     (site_path / "server.txt").write_text(server_id)

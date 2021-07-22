@@ -15,7 +15,7 @@ import datetime
 def dump_error_obj(obj):
     obj["time"] = datetime.datetime.now().isoformat()
     with open("log.txt", "a") as log:
-        log.write(json.dumps(j, indent=2) + "\n=\n")
+        log.write(json.dumps(obj, indent=2) + "\n=\n")
 
 @app.errorhandler(Exception)
 def error_handler(e):

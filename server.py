@@ -191,6 +191,15 @@ USERNAME_ERROR = """
 </ul>
 """
 
+PERMISSIONS_ERROR = """
+<p>We couldn't verify you. There are a few common causes: </p>
+<ul>
+    <li>The role we tried to grant was higher on the permissions list than the verifier's role.</li>
+    <li>The bot has not been correctly installed on the server.</li>
+</ul>
+<p>Contact your server admin!</p>
+"""
+
 def is_site_verified(site, response):
     if not site.replace("_", "").isalnum() or not os.path.isdir(site):
         response["error"] = {
@@ -263,14 +272,17 @@ def verify():
                     response["confirmation"]["confirm_terms"]
                     and response["confirmation"]["confirm_details"]
                 ):
-                    response["confirmation"]["result"] = change_member(
-                        settings["server"],
-                        response["discord"]["discord_id"],
-                        [VERIFIED_ROLE["id"]],
-                        [RM_VERIFIED_ROLE["id"]] if RM_VERIFIED_ROLE else [],
-                    )
-                    write_to_students(site, user_dict, discord_info["user"])
-                    response["confirmation"]["ok"] = True
+                    try:
+                        response["confirmation"]["result"] = change_member(
+                            settings["server"],
+                            response["discord"]["discord_id"],
+                            [VERIFIED_ROLE["id"]],
+                            [RM_VERIFIED_ROLE["id"]] if RM_VERIFIED_ROLE else [],
+                        )
+                        write_to_students(site, user_dict, discord_info["user"])
+                        response["confirmation"]["ok"] = True
+                    except:
+                        response["error"] = {"text": PERMISSIONS_ERROR}
 
     return make_response(jsonify(response))
 
