@@ -1,0 +1,145 @@
+<html data-ember-extension="1" lang="en">
+  <head>
+    <link
+      rel="canonical"
+      href="https://getbootstrap.com/docs/4.0/examples/sticky-footer/"
+    />
+
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico" />
+
+    <title>Discord Verifier by tfpk</title>
+    <!-- Bootstrap core CSS -->
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+    />
+
+    <!-- Custom styles for this template -->
+    <link href="sticky-footer.css" rel="stylesheet" />
+  </head>
+
+  <body class="vsc-initialized">
+    <!-- Begin page content -->
+    <main role="main" class="container">
+      <h1 class="mt-5">Discord Verifier Instructions</h1>
+      <p>Your Discord Verifier has now been configured!</p>
+      <p>If you got this link from an email, you will have been given two
+        important pieces of text:</p>
+      <ol>
+        <li><b>Your Short Code</b>: this is the "name" of your server on this
+          verifier. For instance, it might be "csesoc". It will be in every
+          URL you have access to on this site.</li>
+        <li><b>Your Admin Key</b>: all data stored on this site is encrypted,
+          which makes it very secure. To access the data, you will need to enter
+          this key. <strong>Keep it secret</strong>, as it (along with your zID/zPass)
+          is all that is needed to access your club's sign-in data.
+          </li>
+      </ol>
+      <p>There are two pages that are now available to you:</p>
+      <p>
+        The registration page:
+        https://web.cse.unsw.edu.au/~apps/discord/(your_short_code)/
+      </p>
+      <p>
+        This page is for anyone wishing to join your server. Direct them here
+        from a public channel, or in your marketing for your server.
+      </p>
+      <p>
+        They will be asked to input a zID, zPass, their discord username, and
+        then to accept your server rules (as well as Arc’s rules).
+      </p>
+      <p>
+        You should confirm now that this setup works as expected. If you have
+        any issues, please contact <a href="mailto:apps.discord@cse.unsw.edu.au">apps.discord@cse.unsw.edu.au</a>
+      </p>
+      <p>
+        The admin page:
+        https://web.cse.unsw.edu.au/~apps/discord/(your_short_code)/admin.html
+      </p>
+      <p>
+        When you login, you can configure:
+      </p>
+      <ul>
+        <li>Your Discord Server ID</li>
+        <li>The name of the role to grant on verification</li>
+        <li>Up to two admin zIDs (see below)</li>
+        <li>Your Server Brand (the text that appears at the top of the registration page)</li>
+        <li>Your Server Rules (the text that appears when a student is asked to accept your rules)</li>
+      </ul>
+      <p>
+        You can also see a list of students who have signed up, and what their zIDs are.
+      </p>
+      <p>
+        When editing the Server Brand and Rules, you will need to use HTML
+        syntax. This makes it very powerful, but it may be difficult to use if
+        you’ve never used HTML before. Use a site like <a href="https://onlinehtmleditor.dev/">this one</a>
+        to convert the starter information to something human readable,
+        and back again! If you have questions, please
+        contact <a href="mailto:apps.discord@cse.unsw.edu.au">apps.discord@cse.unsw.edu.au</a>
+      </p>
+      <p>
+        Only people whose zIDs are listed as admins or who are Arc Staff are
+        able to access the admin page.
+      </p>
+      <p>
+        If you have any issues getting the server to work, please contact
+        <a href="mailto:apps.discord@cse.unsw.edu.au">apps.discord</a>
+        and we will attempt to resolve your issue.
+      </p>
+      <h2>Video Walkthrough</h2>
+      <iframe
+        src="https://www.youtube.com/embed/o0zWFWpfs5Y"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen=""
+        width="560"
+        height="315"
+        frameborder="0"
+      ></iframe>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted"
+          >Created by Tom Kunc (~tfpk) or at
+          <a href="mailto:tfpk@cse.unsw.edu.au">tfpk@cse.unsw.edu.au</a>;
+          originally for CSESoc.</span
+        >
+      </div>
+    </footer>
+    <style>
+      html {
+        position: relative;
+        min-height: 100%;
+      }
+      body {
+        margin-bottom: 60px; /* Margin bottom by footer height */
+      }
+      .footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 60px; /* Set the fixed height of the footer here */
+        line-height: 60px; /* Vertically center the text there */
+        background-color: #f5f5f5;
+      }
+
+      /* Custom page CSS
+-------------------------------------------------- */
+      /* Not required for template or sticky footer method. */
+
+      .container {
+        width: auto;
+        max-width: 680px;
+        padding: 0 15px;
+      }
+    </style>
+  </body>
+</html>
